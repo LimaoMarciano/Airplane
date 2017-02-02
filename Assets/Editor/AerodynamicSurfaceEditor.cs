@@ -24,6 +24,7 @@ public class AerodynamicSurfaceEditor : Editor {
 
 		myTarget.liftCoefficient = EditorGUILayout.FloatField ("Lift coefficient", myTarget.liftCoefficient);
 		myTarget.liftPerAngle = EditorGUILayout.CurveField ("Lift per angle", myTarget.liftPerAngle, GUILayout.Height (70));
+		myTarget.invertLift = EditorGUILayout.Toggle ("Invert lift", myTarget.invertLift);
 
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField ("Drag", EditorStyles.boldLabel);
@@ -32,7 +33,7 @@ public class AerodynamicSurfaceEditor : Editor {
 		float sideDrag = EditorGUILayout.FloatField ("Lateral side", myTarget.dragCoefficient.x);
 		float upDrag = EditorGUILayout.FloatField ("Upper side", myTarget.dragCoefficient.y);
 
-		myTarget.dragCoefficient = new Vector3 (sideDrag, frontalDrag, upDrag);
+		myTarget.dragCoefficient = new Vector3 (sideDrag, upDrag, frontalDrag);
 
 		//Angle
 		EditorGUILayout.Space();

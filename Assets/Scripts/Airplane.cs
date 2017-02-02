@@ -6,7 +6,7 @@ using UnityEngine;
 public class Airplane : MonoBehaviour {
 
 	public Rigidbody rb;
-	public Vector3 centerOfMass;
+	public Transform centerOfMass;
 	private List<AerodynamicSurface> surfaces = new List<AerodynamicSurface>();
 
 	void Awake() {
@@ -19,7 +19,7 @@ public class Airplane : MonoBehaviour {
 		if (rb != null) {
 			
 			rb = GetComponent<Rigidbody> ();
-			rb.centerOfMass = centerOfMass;
+			rb.centerOfMass = centerOfMass.localPosition;
 
 			foreach (AerodynamicSurface surface in GetComponentsInChildren<AerodynamicSurface>()) {
 				surfaces.Add (surface);
@@ -51,6 +51,6 @@ public class Airplane : MonoBehaviour {
 	}
 
 	void OnDrawGizmosSelected () {
-		Gizmos.DrawIcon (transform.position + centerOfMass, "CenterOfMassIcon.png", true);
+//		Gizmos.DrawIcon (transform.position + centerOfMass, "CenterOfMassIcon.png", true);
 	}
 }

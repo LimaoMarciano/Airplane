@@ -9,6 +9,7 @@ public class AerodynamicSurface : MonoBehaviour {
 	public float liftCoefficient = 1;
 	public Vector3 dragCoefficient;
 	public AnimationCurve liftPerAngle;
+	public bool invertLift = false;
 
 	public Vector3 rotationAxis;
 	public float minAngle = 0;
@@ -81,6 +82,10 @@ public class AerodynamicSurface : MonoBehaviour {
 		//Lift
 		angleOfAttack = -Mathf.Atan2 (localVelocity.y, localVelocity.z) * Mathf.Rad2Deg;
 		liftForce = liftPerAngle.Evaluate (angleOfAttack) * liftCoefficient * Enviroment.instance.airDensity * (velocity.sqrMagnitude / 2);
+
+		if (invertLift) {
+			liftForce *= -1;
+		}
 
 		//Drag
 		Vector3 dragVector = Vector3.Scale (dragCoefficient, localVelocity.normalized);
