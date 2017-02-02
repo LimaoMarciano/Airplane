@@ -6,31 +6,22 @@ public class AerodynamicSurface : MonoBehaviour {
 
 	public Rigidbody rb;
 
-	[Header ("Surface properties")]
 	public float liftCoefficient = 1;
 	public Vector3 dragCoefficient;
 	public AnimationCurve liftPerAngle;
 
-	[Header ("Surface rotation")]
 	public Vector3 rotationAxis;
-	[Range (0, 30)]
 	public float minAngle = 0;
-	[Range (0, 30)]
 	public float maxAngle = 0;
-	[Range (-1, 1)]
 	public float angleInput = 0;
 
-	[Header ("Surface rotation offset")]
-	[Range (0, 30)]
 	public float minOffset = 0;
-	[Range (0, 30)]
 	public float maxOffset = 0;
-	[Range (-1, 1)]
 	public float offsetInput = 0;
 
-	[ReadOnly]public float angleOfAttack = 0;
-	[ReadOnly]public float liftForce;
-	[ReadOnly]public float drag;
+	public float angleOfAttack = 0;
+	public float liftForce;
+	public float drag;
 
 	private Vector3 airVelocity;
 	private float airSpeed;
@@ -52,6 +43,10 @@ public class AerodynamicSurface : MonoBehaviour {
 		private set { drag = value; }
 	}
 
+	public float AirSpeed {
+		get { return airSpeed; }
+		private set { airSpeed = value; }
+	}
 
 
 	// Use this for initialization
@@ -68,14 +63,20 @@ public class AerodynamicSurface : MonoBehaviour {
 
 		transform.localRotation = initialRotation * Quaternion.AngleAxis (surfaceAngle, rotationAxis);
 
-//		transform.localEulerAngles = initialAngle + new Vector3 (surfaceAngle, 0, 0);
-//		Debug.Log (initialAngle + new Vector3 (surfaceAngle, 0, 0));
-
 	}
 
 	void FixedUpdate () {
+
+		if (rb == null) {
+			gameObject.SetActive (false);
+			Debug.LogWarning ("Aerodynamic surface " + gameObject.name + " doesn't have a parent with Airplane component. Object will be disabled.");
+			return;
+		}
+
+
 		Vector3 velocity = rb.velocity + Enviroment.instance.windVelocity;
 		Vector3 localVelocity = transform.InverseTransformDirection (velocity);
+		airSpeed = velocity.magnitude;
 
 		//Lift
 		angleOfAttack = -Mathf.Atan2 (localVelocity.y, localVelocity.z) * Mathf.Rad2Deg;
@@ -84,12 +85,11 @@ public class AerodynamicSurface : MonoBehaviour {
 		//Drag
 		Vector3 dragVector = Vector3.Scale (dragCoefficient, localVelocity.normalized);
 		drag = dragVector.magnitude;
-		//		rb.drag = dragMagnitude;
 
-		if (rb != null) {
-			Vector3 force = transform.up * liftForce;
-			rb.AddForceAtPosition (force, transform.position, ForceMode.Force);
-		}
+
+		Vector3 force = transform.up * liftForce;
+		rb.AddForceAtPosition (force, transform.position, ForceMode.Force);
+
 	}
 
 }

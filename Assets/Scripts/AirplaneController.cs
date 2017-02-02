@@ -23,11 +23,15 @@ public class AirplaneController : MonoBehaviour {
 		float horizontal = Input.GetAxis ("Horizontal");
 		float vertical = Input.GetAxis ("Vertical");
 
+		float rudderInput = Input.GetAxis ("Rudder");
+
 		leftAileron.angleInput = -horizontal;
 		rightAileron.angleInput = horizontal;
 
 		leftElevator.angleInput = -vertical;
 		rightElevator.angleInput = -vertical;
+
+		rudder.angleInput = rudderInput;
 
 		if (Input.GetButtonDown ("Flaps")) {
 			isFlapActive = !isFlapActive;

@@ -6,8 +6,8 @@ using UnityEngine;
 public class Airplane : MonoBehaviour {
 
 	public Rigidbody rb;
-	public Transform centerOfMass;
-	public List<AerodynamicSurface> surfaces = new List<AerodynamicSurface>();
+	public Vector3 centerOfMass;
+	private List<AerodynamicSurface> surfaces = new List<AerodynamicSurface>();
 
 	void Awake() {
 		foreach (WheelCollider w in GetComponentsInChildren<WheelCollider>()) 
@@ -16,27 +16,41 @@ public class Airplane : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		rb = GetComponent<Rigidbody> ();
-		rb.centerOfMass = centerOfMass.localPosition;
+		if (rb != null) {
+			
+			rb = GetComponent<Rigidbody> ();
+			rb.centerOfMass = centerOfMass;
 
+			foreach (AerodynamicSurface surface in GetComponentsInChildren<AerodynamicSurface>()) {
+				surfaces.Add (surface);
+				surface.rb = rb;
+			}
 
+		} else {
+			
+			Debug.LogWarning ("Airplane " + gameObject.name + " doesn't have a Rigidbody set. This Airplane won't do anything!");
 
-		foreach (AerodynamicSurface surface in surfaces) {
-			surface.rb = rb;
 		}
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		float totalDrag = 0;
+		if (rb != null) {
+			
+			float totalDrag = 0;
 
-		foreach (AerodynamicSurface surface in surfaces) {
-			totalDrag += surface.Drag;
+			foreach (AerodynamicSurface surface in surfaces) {
+				totalDrag += surface.Drag;
+			}
+
+			rb.drag = totalDrag;
 		}
 
-		rb.drag = totalDrag;
+	}
 
-		Debug.Log (rb.velocity.magnitude);
+	void OnDrawGizmosSelected () {
+		Gizmos.DrawIcon (transform.position + centerOfMass, "CenterOfMassIcon.png", true);
 	}
 }

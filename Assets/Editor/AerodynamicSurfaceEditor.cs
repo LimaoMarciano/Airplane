@@ -6,72 +6,74 @@ using UnityEditor;
 [CustomEditor(typeof(AerodynamicSurface))]
 public class AerodynamicSurfaceEditor : Editor {
 
-	private bool isDragOpen = false;
+	private AerodynamicSurface myTarget;
 
-	private float minAngle = 0;
-	private float maxAngle = 15;
-	private float minOffset = 0;
-	private float maxOffset = 15;
+	public void OnEnable () {
+		
+		myTarget = (AerodynamicSurface)target;
 
+		if (myTarget.liftPerAngle == null) {
+			myTarget.liftPerAngle = new AnimationCurve ();
+		}
+	}
 
 	public override void OnInspectorGUI () {
 
-		AerodynamicSurface myTarget = (AerodynamicSurface)target;
-
-//		DrawDefaultInspector ();
 		EditorGUILayout.Space();
-		EditorGUILayout.LabelField ("Surface properties", EditorStyles.boldLabel);
+		EditorGUILayout.LabelField ("Lift", EditorStyles.boldLabel);
+
 		myTarget.liftCoefficient = EditorGUILayout.FloatField ("Lift coefficient", myTarget.liftCoefficient);
-
-		isDragOpen = EditorGUILayout.Foldout (isDragOpen, "Parasitic Drag");
-		if (isDragOpen) {
-			float frontalDrag = EditorGUILayout.FloatField ("Frontal side", myTarget.dragCoefficient.z);
-			float sideDrag = EditorGUILayout.FloatField ("Lateral side", myTarget.dragCoefficient.x);
-			float upDrag = EditorGUILayout.FloatField ("Upper side", myTarget.dragCoefficient.y);
-
-			myTarget.dragCoefficient = new Vector3 (sideDrag, frontalDrag, upDrag);
-		}
-
-		//Lift curve
 		myTarget.liftPerAngle = EditorGUILayout.CurveField ("Lift per angle", myTarget.liftPerAngle, GUILayout.Height (70));
+
+		EditorGUILayout.Space();
+		EditorGUILayout.LabelField ("Drag", EditorStyles.boldLabel);
+
+		float frontalDrag = EditorGUILayout.FloatField ("Frontal side", myTarget.dragCoefficient.z);
+		float sideDrag = EditorGUILayout.FloatField ("Lateral side", myTarget.dragCoefficient.x);
+		float upDrag = EditorGUILayout.FloatField ("Upper side", myTarget.dragCoefficient.y);
+
+		myTarget.dragCoefficient = new Vector3 (sideDrag, frontalDrag, upDrag);
 
 		//Angle
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField ("Surface rotation", EditorStyles.boldLabel);
 
-		minAngle = EditorGUILayout.DelayedFloatField ("Min angle", minAngle);
-		maxAngle = EditorGUILayout.DelayedFloatField ("Max angle", maxAngle);
-		EditorGUILayout.MinMaxSlider (ref minAngle, ref maxAngle, 0, 50);
+		myTarget.rotationAxis = EditorGUILayout.Vector3Field ("Rotation axis", myTarget.rotationAxis);
 
-		minAngle = Mathf.Round (minAngle);
-		maxAngle = Mathf.Round (maxAngle);
+		myTarget.minAngle = EditorGUILayout.DelayedFloatField ("Min angle", myTarget.minAngle);
+		myTarget.maxAngle = EditorGUILayout.DelayedFloatField ("Max angle", myTarget.maxAngle);
+		EditorGUILayout.MinMaxSlider (ref myTarget.minAngle, ref myTarget.maxAngle, 0, 50);
 
-		myTarget.minAngle = minAngle;
-		myTarget.maxAngle = maxAngle;
+		myTarget.minAngle = Mathf.Round (myTarget.minAngle);
+		myTarget.maxAngle = Mathf.Round (myTarget.maxAngle);
+
 
 		//Offset
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField ("Offset rotation", EditorStyles.boldLabel);
 
-		minOffset = EditorGUILayout.DelayedFloatField ("Min offset", minOffset);
-		maxOffset = EditorGUILayout.DelayedFloatField ("Max offset", maxOffset);
-		EditorGUILayout.MinMaxSlider (ref minOffset, ref maxOffset, 0, 50);
+		myTarget.minOffset = EditorGUILayout.FloatField ("Min offset", myTarget.minOffset);
+		myTarget.maxOffset = EditorGUILayout.FloatField ("Max offset", myTarget.maxOffset);
+		EditorGUILayout.MinMaxSlider (ref myTarget.minOffset, ref myTarget.maxOffset, 0, 50);
 
-		minOffset = Mathf.Round (minOffset);
-		maxOffset = Mathf.Round (maxOffset);
+		myTarget.minOffset = Mathf.Round (myTarget.minOffset);
+		myTarget.maxOffset = Mathf.Round (myTarget.maxOffset);
 
-		myTarget.minOffset = minOffset;
-		myTarget.maxOffset = maxOffset;
 
 		if (Application.isPlaying) {
-			EditorGUILayout.Space();
+			GUILayout.BeginVertical ("box");
 			EditorGUILayout.LabelField ("Info", EditorStyles.boldLabel);
 
-			EditorGUILayout.LabelField ("Angle of attck: ", myTarget.AngleOfAttack.ToString("F1"));
-			EditorGUILayout.LabelField ("Current lift: ", myTarget.liftForce.ToString("F0"));
+			EditorGUILayout.LabelField ("Airspeed: ", myTarget.AirSpeed.ToString("F1"));
+			EditorGUILayout.LabelField ("Angle of attack: ", myTarget.AngleOfAttack.ToString("F1"));
+			EditorGUILayout.LabelField ("Current lift: ", myTarget.liftForce.ToString("F1"));
 			EditorGUILayout.LabelField ("Drag: ", myTarget.Drag.ToString ("F1"));
 
+			GUILayout.EndVertical ();
+
 		}
+
+		EditorGUILayout.Space ();
 
 	}
 
